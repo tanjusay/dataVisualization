@@ -4,61 +4,76 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 
-st.title("Data Visualizer App 📈 📉")
+from io import BytesIO
 
-# File uploader
+# Streamlit app
 
-file = st.file_uploader("Upload Excel or PDF file", type=["xlsx", "xls", "pdf"])
+st.title("📈 Data Visuals 📊")
 
-if file is not None:
+# Upload Excel file
 
-    file_ext = file.name.split(".")[-1]
+uploaded_file = st.file_uploader("Upload Excel file", type=["xlsx"])
 
-    
+if uploaded_file is not None:
 
-    if file_ext in ["xlsx", "xls"]:
+    try:
 
-        # Read Excel file
+        # Read data from Excel file
 
-        df = pd.read_excel(file)
+        df = pd.read_excel(uploaded_file)
 
-    elif file_ext == "pdf":
+        # Display data
 
-        # Read PDF file
+        st.subheader("Raw Data")
 
-        df = pd.read_pdf(file)
+        st.dataframe(df)
 
-    else:
+        # Plot options
 
-        st.error("Unsupported file format.")
+        plot_type = st.selectbox("Select Plot Type", ["Linear", "Bar"])
 
-        st.stop()
+        # Plot the data
 
-    
+        st.subheader("Data Visualization")
 
-    # Perform data processing and visualization
+        if plot_type == "Linear":
 
-    st.subheader("Data Summary")
+            plt.plot(df.iloc[:, 0], df.iloc[:, 1])
 
-    st.write(df.head())
+            plt.xlabel(df.columns[0])
 
-    column_selectbox = st.selectbox("Select a column for visualization", df.columns)
+            plt.ylabel(df.columns[1])
 
-    # Group data by selected column and count occurrences
+            plt.title('Data Trend')
 
-    data_counts = df[column_selectbox].value_counts()
+            st.pyplot()
 
-    st.subheader("Bar Chart")
+        elif plot_type == "Bar":
 
-    plt.figure(figsize=(10, 6))
+            plt.bar(df.iloc[:, 0], df.iloc[:, 1])
 
-    plt.bar(data_counts.index, data_counts.values)
+            plt.xlabel(df.columns[0])
 
-    plt.xlabel(column_selectbox)
+            plt.ylabel(df.columns[1])
 
-    plt.ylabel("Count")
+            plt.title('Data Comparison')
 
-    plt.xticks(rotation=45)
+            st.pyplot()
 
-    st.pyplot()
+        # Conclusion
 
+        st.subheader("Conclusion")
+
+        if df.iloc[:, 1].sum() > 5000:
+
+            st.write("The total data indicates a positive trend.")
+
+        else:
+
+            st.write("The total data indicates a stagnant or negative trend.")
+
+    except Exception as e:
+
+        st.error("Error: Unable to read the Excel file. Please make sure it is in the correct format.")
+
+ 
