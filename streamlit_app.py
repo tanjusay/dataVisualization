@@ -4,7 +4,7 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 
-st.title("Data Visualization")
+st.title("Data Visualizer App 📈 📉")
 
 # File uploader
 
